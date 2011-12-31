@@ -2,13 +2,18 @@ import re
 wsRegex =re.compile("(^[\s\t]+)")
 
 def level(line):
-	return len(wsRegex.findall(line))
+	matches = wsRegex.findall(line)
+	if matches:
+		return len(matches[0])
+	else:
+		return 0
 	
 def appendParens(line, count):
 	return line + ''.join([')' for p in range(count)])
 
 def prependWhitespace(count):
-	return " ".join([' ' for x in range(count)])
+	print count
+	return "".join([' ' for x in range(count)])
 	
 def compile(filename):
 	"""
