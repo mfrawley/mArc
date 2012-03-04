@@ -1,8 +1,8 @@
-define (factorial n)
+fn (factorial n)
   if (<= n 1) 1
     * n (factorial (- n 1))
 
-define (add a b)
+fn (add a b)
   (+ a b)
   
 = get (fn (id)

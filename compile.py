@@ -12,7 +12,6 @@ def appendParens(line, count):
 	return line + ''.join([')' for p in range(count)])
 
 def prependWhitespace(count):
-	print count
 	return "".join([' ' for x in range(count)])
 	
 def compile(filename):

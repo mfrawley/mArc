@@ -1,0 +1,3 @@
+1. Make .mrc files compile to single lines per function.
+2. Make lavascript parser parse each line, currently only the first is getting parsed.
+3. Re-implement mArc optional whitespace syntax in CoffeeScript.
