@@ -26,6 +26,8 @@ isEqual = _.isEqual
 test = (name, actual, expected) ->
   unless isEqual(actual, expected)
     pr "#{name} test failed"
+  else
+    pr "#{name} test passed"
 
 isArray = _.isArray
 isEmpty = _.isEmpty
@@ -39,14 +41,7 @@ stdout = process.stdout
 
 isList = isArray
 
-test('isList #1', isList([]), true)
-test('isList #2', isList([1]), true)
-test('isList #3', isList('foo'), false)
-
 isAtom = (x) ->  not isList(x)
-
-test('isAtom #1', isAtom('x'), true)
-test('isAtom #2', isAtom(['x']), false)
 
 pair = (xs) ->
   acc = []
@@ -54,10 +49,6 @@ pair = (xs) ->
     acc.push(xs[0..1])
     xs = xs[2..]
   acc
-
-test('pair #1', pair(['a', '1']), [['a', '1']])
-test('pair #2', pair(['a', '1', 'b']), [['a', '1'], ['b']])
-test('pair #3', pair(['a', '1', 'b', '2']), [['a', '1'], ['b', '2']])
 
 ## Reader
 
@@ -98,20 +89,15 @@ tokenize = (s) ->
    .split(' ')
 
 read = (s) ->
-  pr 's'+s
+  #pr 's'+s
   tokenized = tokenize(s)
-  pr 'tokenized'
+  #pr 'tokenized'
   pr tokenized
   allRead = readFrom tokenized
   
   allRead
 
 parse = read
-
-test('parse #1', parse('x'), 'x')
-test('parse #2', parse('(x)'), ['x'])
-test('parse #3', parse('(x y)'), ['x', 'y'])
-test('parse #4', parse('((x) y)'), [['x'], 'y'])
 
 ## Compiler (lc)
 
@@ -123,18 +109,13 @@ test('parse #4', parse('((x) y)'), [['x'], 'y'])
 # definition, essentially by hand-generating
 # the macro-expansion of the arc macro,
 # extend (http://awwx.ws/extend).
-
-
 lc = ->
 
 lava = (s) -> lc parse(s)
 
 # atom
-
 lc = (s) ->
   if isAtom(s) then s
-
-test('atom #1', lava('x'), 'x')
 
 # proc
 
@@ -161,12 +142,7 @@ lcProc = (f, args) ->
     else orig(s)
 )()
 
-test('proc #1', lava('(foo)'), 'foo()')
-test('proc #2', lava('(foo x)'), 'foo(x)')
-test('proc #3', lava('(foo x y)'), 'foo(x,y)')
-
 # infix
-
 lcInfix1 = (op, xs) ->
   acc = ""
   each xs, (x) ->
@@ -191,33 +167,7 @@ infixOps = ['+','-','*','/','%',
     else orig(s)
 )()
 
-test('infix #1', lava('(+ x y)'), "x+y")
-test('infix #2', lava('(+ x y z)'), "x+y+z")
-test('infix #3', lava('(- x y)'), "x-y")
-test('infix #4', lava('(* x y)'), "x*y")
-test('infix #5', lava('(% x y)'), "x%y")
-
-test('infix #6', lava('(>= x y)'), "x>=y")
-test('infix #7', lava('(<= x y)'), "x<=y")
-test('infix #8', lava('(> x y)'), "x>y")
-test('infix #9', lava('(< x y)'), "x<y")
-test('infix #10', lava('(== x y)'), "x==y")
-test('infix #11', lava('(=== x y)'), "x===y")
-test('infix #12', lava('(!= x y)'), "x!=y")
-test('infix #13', lava('(!== x y)'), "x!==y")
-
-test('infix #14', lava('(= x y)'), "x=y")
-test('infix #15', lava('(+= x y)'), "x+=y")
-test('infix #16', lava('(-= x y)'), "x-=y")
-test('infix #17', lava('(*= x y)'), "x*=y")
-test('infix #18', lava('(/= x y)'), "x/=y")
-test('infix #19', lava('(%= x y)'), "x%=y")
-
-test('infix #20', lava('(&& x y)'), "x&&y")
-test('infix #21', lava('(|| x y)'), "x||y")
-
 # obj
-
 lcObj3 = (xs) ->
   acc = ""
   each xs, (x) ->
@@ -246,13 +196,7 @@ lcObj = (xs) ->
     else orig(s)
 )()
 
-test('obj #1', lava('(obj)'), "{}")
-test('obj #2', lava('(obj x y)'), "{x:y}")
-test('obj #3', lava('(obj x y z a)'), "{x:y,z:a}")
-test('obj #4', lava('(obj x y z (+ x y))'), "{x:y,z:x+y}")
-
 # array
-
 lcArray2 = (xs) ->
   acc = ""
   each xs, (x) ->
@@ -275,13 +219,7 @@ lcArray = (xs) ->
     else orig(s)
 )()
 
-test('array #1', lava('(array)'), "[]")
-test('array #2', lava('(array x)'), "[x]")
-test('array #3', lava('(array x y)'), "[x,y]")
-test('array #4', lava('(array x (array y))'), "[x,[y]]")
-
 # ref
-
 lcRef = (xs) ->
   [h, k] = xs
   lc(h) + '[' + lc(k) + ']'
@@ -293,8 +231,6 @@ lcRef = (xs) ->
       lcRef(s[1..])
     else orig(s)
 )()
-
-test('ref #1', lava('(ref x y)'), "x[y]")
 
 # dot
 lcDot = (xs) ->
@@ -309,10 +245,7 @@ lcDot = (xs) ->
     else orig(s)
 )()
 
-test('dot #1', lava('(dot x y)'), "x.y")
-
 # if
-
 lcIf3 = (ps) ->
   acc = ""
   each ps, (p, i) ->
@@ -346,14 +279,7 @@ lcIf = (xs) ->
     else orig(s)
 )()
 
-test('if #1', lava('(if)'), "")
-test('if #2', lava('(if x)'), "x")
-test('if #3', lava('(if x y)'), "(x?y:undefined)")
-test('if #4', lava('(if x y z)'), "(x?y:z)")
-test('if #5', lava('(if x y z a)'), "(x?y:z?a:undefined)")
-
 # do
-
 lcDo1 = (xs) ->
   acc = ""
   each xs, (x) ->
@@ -373,13 +299,7 @@ lcDo = (xs) ->
     else orig(s)
 )()
 
-test('do #1', lava('(do)'), "")
-test('do #2', lava('(do x)'), "x")
-test('do #3', lava('(do x y)'), "x,y")
-test('do #4', lava('(do x y z)'), "x,y,z")
-
 # fn
-
 lcFn4 = (xs) ->
   if isEmpty(xs)
     ""
@@ -409,15 +329,7 @@ lcDef = (name, xs) ->
     else orig(s)
 )()
 
-test('fn #1', lava('(fn ())'), "(function(){})")
-test('fn #2', lava('(fn (x))'), "(function(x){})")
-test('fn #3', lava('(fn (x) x)'), "(function(x){return x;})")
-test('fn #4', lava('(fn (x y) x)'), "(function(x,y){return x;})")
-#test('fn #5', lava('(fn (x) x y)'), "(function(x){return x,y;})")
-#test('fn #6', lava('(fn (x y) x y)'), "(function(x,y){return x,y;})")
-
 # mac
-
 macros = {}
 
 lcMac1 = (name, definition) ->
@@ -434,20 +346,6 @@ lcMac = (xs) ->
     else orig(s)
 )()
 
-lc(['mac', 'foo'])
-test('mac #1', macros.foo, [])
-macros = {}
-
-lc(['mac', 'foo', ['x'], 'x'])
-test('mac #2', macros.foo, [['x'], 'x'])
-macros = {}
-
-lc(['mac', 'foo', ['x', 'y'], 'x'])
-test('mac #3', macros.foo, [['x', 'y'], 'x'])
-macros = {}
-
-lc(['mac', 'foo', ['x', 'y'], ['x', 'y']])
-test('mac #4', macros.foo, [['x', 'y'], ['x', 'y']])
 macros = {}
 
 # quote
@@ -460,20 +358,12 @@ macros = {}
     else orig(s)
 )()
 
-test('quote #1', lc(['quote', 'x']), 'x')
-test('quote #2', lc(['quote', ['x']]), ['x'])
-test('quote #3', lc(['quote', ['x', 'y']]), ['x', 'y'])
-
 # macro-expand
 
 bind = (parms, args, env={}) ->
   each parms, (parm, i) ->
     env[parm] = args[i]
   env
-
-test('bind #1', bind([], []), {})
-test('bind #2', bind(['x'], ['y']), {'x':'y'})
-test('bind #3', bind(['x', 'z'], ['y', 'a']), {'x':'y', 'z':'a'})
 
 macroExpand1 = (x, env) ->
   if isAtom x
@@ -483,13 +373,6 @@ macroExpand1 = (x, env) ->
     each x, (elt) ->
       acc.push macroExpand1(elt, env)
     acc
-
-test('macroExpand1 #1', macroExpand1('x', {}), 'x')
-test('macroExpand1 #2', macroExpand1('x', {'x':'y'}), 'y')
-test('macroExpand1 #3', macroExpand1('x', {'x': ['a','b'] }), ['a','b'])
-test('macroExpand1 #4', macroExpand1(['x', 'y'], {}), ['x','y'])
-test('macroExpand1 #5', macroExpand1(['x', 'y'], {'x':'y'}), ['y','y'])
-test('macroExpand1 #6', macroExpand1(['x', ['y', 'z']], {'z':'a'}), ['x', ['y', 'a']])
 
 macroExpand = (name, args) ->
   [parms, body] = macros[name]
@@ -504,53 +387,41 @@ macroExpand = (name, args) ->
     else orig(s)
 )()
 
-lc(['mac', 'foo', ['x'], 'x'])
-test('macro-expand #1', lc(['foo', 'y']), 'y')
-macros = {}
+#lc(['mac', 'foo', ['x'], 'x'])
+
+#macros = {}
 
 ## Interface
-
 lava = (s) -> lc parse(s)
 
-test('lava #1', lava('x'), 'x')
-test('lava #2', lava('(+ x y)'), 'x+y')
-test('lava #3', lava('(do x y)'), 'x,y')
-#test('lava #4', lava('(fn (x y) x y)'), '(function(x,y){return x,y;})')
+#lava("(mac let1 (var val body)
+#        ((fn (var) body) val))")
 
-lava("(mac let1 (var val body)
-        ((fn (var) body) val))")
-test('lava #5', lava('(let1 x 5 x)'), '(function(x){return x;})(5)')
 macros = {}
 
 if process.argv.length > 2
   fs = require('fs')
   filename = process.argv[2]
   contents = fs.readFileSync(filename, 'utf-8')
-  #log 'contents'
-  #log contents
 
   ast = parse(contents)
-  #log 'ast'
-  #log ast
+
   jsContents = lava contents
-  #log 'jsContents'
-  #log jsContents
   process.exit()
 else
+  if not module.parent
+    printOutput = (x) ->
+      stdout.write x + '\n' + '=> ' + eval(x) + '\n>'
 
-  printOutput = (x) ->
-    stdout.write x + '\n' + '=> ' + eval(x) + '\n>'
+    printInputAndEval = (x) ->
+      printOutput lava(x)
 
-  printInputAndEval = (x) ->
-    pr x
-    printOutput lava(x)
-
-  repl = ->
-    # stdin is paused by default, so this resumes it
-    stdin.resume()
-    # makes return a string instead of a stream (?)
-    stdin.setEncoding('utf8')
-    stdout.write '> '
-    stdin.on 'data', printInputAndEval
-    
-  repl()
+    repl = ->
+      # stdin is paused by default, so this resumes it
+      stdin.resume()
+      # makes return a string instead of a stream (?)
+      stdin.setEncoding('utf8')
+      stdout.write '> '
+      stdin.on 'data', printInputAndEval
+  
+    repl()
