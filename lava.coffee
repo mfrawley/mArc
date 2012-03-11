@@ -411,7 +411,13 @@ if process.argv.length > 2
 else
   if not module.parent
     printOutput = (x) ->
-      stdout.write x + '\n' + '=> ' + eval(x) + '\n>'
+      try
+        out = eval(x)
+        stdout.write x + '\n' + '=> ' + out + '\n>'
+      catch e
+        log e
+        stdout.write '\n>'
+      
 
     printInputAndEval = (x) ->
       printOutput lava(x)
