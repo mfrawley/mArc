@@ -283,7 +283,7 @@ lcIf = (xs) ->
 lcDo1 = (xs) ->
   acc = ""
   each xs, (x) ->
-    acc += ',' + lc(x)
+    acc += ', ' + lc(x)
   acc
 
 lcDo = (xs) ->
@@ -316,8 +316,17 @@ lcFn1 = (xs) ->
 lcFn = (xs) ->
   '(' + lcFn1(xs) + ')'
 
-lcDef = (name, xs) ->
-  name + ' = '+ lcFn1(xs) + ';'
+lcDef = (xs) ->
+  if isList(xs[0])
+    args = xs[0][1..]
+    fnName = xs[0][0]
+  else
+    args = []
+    fnName = xs[0]
+  #name + ' = '+ lcFn1(xs) + ';'
+  expr = 'function ' +  fnName + '(' + lcFn3(args) + ')' + ' { ' + lcFn4(xs[1..]) + ' }'  
+  console.log expr
+  return expr
   
 (->
   orig = lc
@@ -325,7 +334,7 @@ lcDef = (name, xs) ->
     if isList(s) and s[0] is 'fn'
       lcFn(s[1..])
     else if isList(s) and s[0] is 'define'
-      lcDef(s[1], s[2..])      
+      lcDef(s[1..])
     else orig(s)
 )()
 
