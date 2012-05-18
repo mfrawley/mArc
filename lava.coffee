@@ -28,11 +28,17 @@ test = (name, actual, expected) ->
     pr "#{name} test failed"
   else
     pr "#{name} test passed"
-
+    
+#global methods
 isArray = _.isArray
 isEmpty = _.isEmpty
 each    = _.each
 without = _.without
+first   = _.first
+rest    = _.rest
+min     = _.min
+max     = _.max
+len     = _.size
 
 pr = (args...) -> console.log args...
 
@@ -172,6 +178,8 @@ lcObj3 = (xs) ->
   acc = ""
   each xs, (x) ->
     [k, v] = x
+    if k[0] == ':'
+      k = k[1..]    
     acc += ',' + lc(k) + ':' + lc(v)
   acc
 
@@ -180,6 +188,8 @@ lcObj2 = (xs) ->
     ""
   else
     [k, v] = xs[0]
+    if k[0] == ':'
+      k = k[1..]
     lc(k) + ':' + lc(v) + lcObj3(xs[1..])
 
 lcObj1 = (xs) ->
@@ -419,10 +429,10 @@ if process.argv.length > 2
   process.exit()
 else
   if not module.parent
-    printOutput = (x) ->
+    printOutput = (output) ->
       try
-        out = eval(x)
-        stdout.write x + '\n' + '=> ' + out + '\n>'
+        evilRes = eval(output)
+        stdout.write output + '\n' + '=> ' + evilRes + '\n>'
       catch e
         log e
         stdout.write '\n>'
